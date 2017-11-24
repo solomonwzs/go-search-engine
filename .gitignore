@@ -1,0 +1,6 @@
+bin/
+deps/
+pkg/
+src/github.com/
+src/main.go
+*.swp
