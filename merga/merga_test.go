@@ -1,6 +1,7 @@
 package merga
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -25,6 +26,18 @@ func (l *intList) Pop() (interface{}, bool) {
 	}
 }
 
+func (l *intList) Len() int {
+	return len(l.arr) - l.offset
+}
+
+func (l *intList) Head() (interface{}, bool) {
+	if l.offset < len(l.arr) {
+		return l.arr[l.offset], true
+	} else {
+		return nil, false
+	}
+}
+
 func win(a, b interface{}) int8 {
 	if a.(int) < b.(int) {
 		return -1
@@ -35,7 +48,10 @@ func win(a, b interface{}) int8 {
 	}
 }
 
-var listArray []DataQueue
+var (
+	listArray  []DataQueue
+	listArray2 []DataLQueue
+)
 
 func init() {
 	listArray = make([]DataQueue, 16, 16)
@@ -55,6 +71,12 @@ func init() {
 	listArray[13] = newIntList([]int{48, 55, 60, 68})
 	listArray[14] = newIntList([]int{44, 55, 66, 77})
 	listArray[15] = newIntList([]int{80, 96, 106, 113})
+
+	listArray2 = make([]DataLQueue, 4, 4)
+	listArray2[0] = newIntList([]int{1, 3, 4, 5, 7})
+	listArray2[1] = newIntList([]int{3, 4, 6, 7})
+	listArray2[2] = newIntList([]int{1, 3, 4, 7})
+	listArray2[3] = newIntList([]int{1, 4, 7})
 }
 
 func TestWinerTree(t *testing.T) {
@@ -100,6 +122,21 @@ func TestLoserTree(t *testing.T) {
 	}
 	if m != 16*4 {
 		t.Fatal("Error")
+	}
+}
+
+func TestIntersect(t *testing.T) {
+	for i, _ := range listArray2 {
+		listArray2[i].(*intList).offset = 0
+	}
+
+	in := NewIntersect(listArray2, win)
+	for true {
+		if i, ok := in.Extract(); !ok {
+			break
+		} else {
+			fmt.Println(i)
+		}
 	}
 }
 

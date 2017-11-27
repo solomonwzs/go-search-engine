@@ -1,7 +1,7 @@
 package merga
 
 type DataLQueue interface {
-	DataQueue
+	Pop() (interface{}, bool)
 	Head() (interface{}, bool)
 	Len() int
 }
@@ -36,6 +36,44 @@ func NewIntersect(queues []DataLQueue, f FuncComp) *Intersect {
 func (in *Intersect) Extract() (ret interface{}, ok bool) {
 	if in.end {
 		return nil, false
+	}
+
+	for true {
+		data, ok := in.queues[in.si].Pop()
+		if !ok {
+			in.end = true
+			break
+		}
+
+		c := true
+		for i := 0; i < len(in.queues) && c; i++ {
+			if i == in.si {
+				continue
+			}
+
+			for true {
+				data0, ok0 := in.queues[i].Head()
+				if !ok0 {
+					in.end = true
+					break
+				}
+
+				cmp := in.funcComp(data, data0)
+				if cmp == 0 {
+					in.queues[i].Pop()
+					break
+				} else if cmp > 0 {
+					in.queues[i].Pop()
+				} else {
+					c = false
+					break
+				}
+			}
+		}
+
+		if c {
+			return data, true
+		}
 	}
 
 	return
